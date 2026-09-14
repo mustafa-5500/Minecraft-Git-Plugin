@@ -1,10 +1,10 @@
 plugins {
     id 'java'
-    // id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
     id 'com.gradleup.shadow' version '9.3.1'
 }
 
-group = 'com.example'
+group = 'org.almond'
 version = '1.0.0-SNAPSHOT'
 
 // ---------------------------------------------------------------------------
@@ -20,6 +20,12 @@ def hasMcServer = file(mcServerJar).exists()
 if (!hasMcServer) {
     logger.lifecycle("Minecraft server JAR not detected at ${mcServerJar}; run configs will be skipped. " +
             "Set -Pmc_server_jar=/path/to/paper.jar or place paper.jar in the run/ directory to enable them.")
+}
+
+// Shadow plugin is currently commented out above (e.g. offline dev); fall back to the plain jar task.
+def hasShadowPlugin = pluginManager.hasPlugin('com.gradleup.shadow')
+if (!hasShadowPlugin) {
+    logger.lifecycle("Shadow plugin not applied; 'build' will produce the plain jar instead of a shaded jar.")
 }
 
 // ---------------------------------------------------------------------------
@@ -75,14 +81,16 @@ tasks.withType(JavaCompile).configureEach {
 // ---------------------------------------------------------------------------
 // Shadow JAR
 // ---------------------------------------------------------------------------
-tasks.named('shadowJar') {
-    archiveClassifier.set('')
-    mergeServiceFiles()
-}
+if (hasShadowPlugin) {
+    tasks.named('shadowJar') {
+        archiveClassifier.set('')
+        mergeServiceFiles()
+    }
 
-// Ensure the shaded jar is produced during a normal build.
-tasks.named('build') {
-    dependsOn 'shadowJar'
+    // Ensure the shaded jar is produced during a normal build.
+    tasks.named('build') {
+        dependsOn 'shadowJar'
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -90,15 +98,16 @@ tasks.named('build') {
 // ---------------------------------------------------------------------------
 if (hasMcServer) {
     tasks.register('copyToServer', Copy) {
-        dependsOn 'shadowJar'
-        from tasks.named('shadowJar').map { it.archiveFile }
+        def jarTask = hasShadowPlugin ? tasks.named('shadowJar') : tasks.named('jar')
+        dependsOn jarTask
+        from jarTask.map { it.archiveFile }
         into file("${projectDir}/run/plugins")
     }
 }
 
 tasks.register('copyDependencies', Copy) {
     from configurations.compileClasspath
-    into layout.buildDirectory.dir('dependencies')
+    into layout.buildDirectory.dir('libs')
 }
 
 // ---------------------------------------------------------------------------
@@ -114,6 +123,8 @@ if (hasMcServer) {
     if (!pluginsDir.exists()) {
         pluginsDir.mkdirs()
     }
+
+    def serverArgs = "-Xmx2G -Xms1G -jar ${mcServerJar} --nogui"
 
     // IntelliJ IDEA run configuration
     idea.project.settings.runConfigurations {
@@ -159,3 +170,25 @@ if (hasMcServer) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Dev log
+// ---------------------------------------------------------------------------
+// Create or open today's dev log without needing dev-log on the PATH.
+// Usage: gradlew devLog [-Pdate=YYYY-MM-DD] [-Pdeveloper="Name"] [-PnoOpen]
+tasks.register('devLog', Exec) {
+    group = 'documentation'
+    description = "Create or open today's dev log entry (Utils/dev-log-generator)."
+
+    def scriptArgs = ["${projectDir}/Utils/dev-log-generator/generate_dev_log.py"]
+    if (project.hasProperty('date')) {
+        scriptArgs += ['--date', project.property('date')]
+    }
+    if (project.hasProperty('developer')) {
+        scriptArgs += ['--developer', project.property('developer')]
+    }
+    if (project.hasProperty('noOpen')) {
+        scriptArgs += ['--no-open']
+    }
+
+    commandLine(['python', *scriptArgs])
+}
