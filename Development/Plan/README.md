@@ -1,0 +1,1 @@
+This is the Development Plan folder, use it to create plans for how we will implement software. These plans will mostly be unstructured lines of text, allowing us to thoroughly think through edge cases and uses for different functions and objects in the plugin.

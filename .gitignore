@@ -1,0 +1,9 @@
+target/
+build/
+.gradle/
+.idea/
+.vscode/
+run/
+bin/
+*.iml
+*.jar

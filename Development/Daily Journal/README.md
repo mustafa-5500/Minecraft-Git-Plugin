@@ -1,0 +1,1 @@
+This is the Development Daily journal folder, use this to record what work we were doing, to help us get back on track if we miss work for a while. This also tracks how productive and motivated we are for the project over time. With an added goal of incentivizing consistent work being done for the project.

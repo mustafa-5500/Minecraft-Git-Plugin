@@ -1,0 +1,1 @@
+This is the Development Test folder, use it to write out test procedures and cases for manual testing as well as creating automated testing for the plugin.

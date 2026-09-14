@@ -1,0 +1,10 @@
+name: MinecraftTemplatePlugin
+version: '${version}'
+main: com.example.minecrafttemplateplugin.TemplatePlugin
+api-version: '1.21'
+author: YourName
+description: A starter template for Minecraft Paper plugins.
+commands:
+  template:
+    description: Template command to verify the plugin loads.
+    usage: /template
