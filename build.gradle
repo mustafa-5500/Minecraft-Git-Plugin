@@ -56,8 +56,22 @@ repositories {
 }
 
 dependencies {
+    // Paper API is provided by the server at runtime – never bundle it.
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
-    // Your dependencies here
+
+    // JGit – pure-Java Git implementation.
+    // 'implementation' (not compileOnly) so the Shadow plugin bundles it into
+    // the plugin jar; Paper servers do not provide JGit themselves.
+    // Check https://central.sonatype.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+    // for the newest version string before bumping this.
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r'
+
+    // Optional add-ons (uncomment only if you need them):
+    // SSH remotes (git@github.com:... URLs)
+    // implementation 'org.eclipse.jgit:org.eclipse.jgit.ssh.apache:6.10.0.202406032230-r'
+    // GPG-signed commits
+    // implementation 'org.eclipse.jgit:org.eclipse.jgit.gpg.bc:6.10.0.202406032230-r'
+
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 }
 
