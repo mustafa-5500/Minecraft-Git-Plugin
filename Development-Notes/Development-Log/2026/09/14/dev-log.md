@@ -10,7 +10,7 @@ _New to dev logs? Use this section to explain your thought process - decisions m
 Initial commit for this Project, we are making sure the [Utils](../../../../../Utils/) repository is set up properly. The development logging script works.
 
 
-Note: You can add `~~` at the start and end of a line to cross it out; So if an action or goal is complete, crossing it out will communicate that to other developers.
+_Note: You can add `~~` at the start and end of a line to cross it out; So if an action or goal is complete, crossing it out will communicate that to other developers._
 **Goals:**
     - _Longer-term objective(s) this work is building toward. These can span multiple days - leave them in place until complete._
 
